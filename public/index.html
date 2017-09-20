@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <header>
+    <meta charset="UTF-8">
+    
+
+  </header>
+<body onload="init()">
+  <style type="text/css">
+    .message_window {
+    overflow: scroll;
+    font-size: 9pt;
+    width: 400px;
+    height: 500px;
+    }
+
+    .server_side_message {
+    padding: 10px;
+    margin-bottom: 10px;
+    margin-right: 50px;
+    margin-left: 10px;
+    border: 1px dotted #222222;
+    background-color: #A0F0A0;
+    }
+
+    .client_side_message {
+    padding: 10px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    margin-left: 50px;
+    border: 1px;
+    background-color: #A0A0F0;
+    }
+
+  </style>
+  <script>
+    var client_id='';
+
+    function escape_html (string) {
+    if(typeof string !== 'string') {
+    return string;
+    }
+    return string.replace(/[&'`"<>]/g, function(match) {
+      return {
+      '&': '&amp;',
+      "'": '&#x27;',
+      '`': '&#x60;',
+      '"': '&quot;',
+      '<': '&lt;',
+	   '>': '&gt;',
+	}[match]
+	});
+	}
+	
+    function init(){
+    var req = new XMLHttpRequest();
+    req.open('POST', '/get_client_id', false);
+    req.send( null );
+    var data = eval('(' + req.responseText + ')');
+    client_id = data.client_id;
+
+    var req = new XMLHttpRequest();
+    req.open('GET','/kaiwa?' + 'client_id='+ client_id, false);
+    req.setRequestHeader('content-type',
+    'application/x-www-form-urlencoded;charset=UTF-8');
+    req.send(null);
+    var json_data = eval('(' + req.responseText + ')');
+    result.innerHTML = result.innerHTML + '<div class="server_side_message">'  + json_data.response + '</div>';
+    }
+
+    function asyncSend(){
+    if(document.fm.message.value != ''){
+    result.innerHTML = result.innerHTML + '<div class="client_side_message">' + escape_html(document.fm.message.value) + '</div>';
+    }
+    var req = new XMLHttpRequest();
+    req.open('GET','/kaiwa?' + 'client_id='+ client_id + '&message=' + encodeURIComponent(document.fm.message.value), false);
+    req.setRequestHeader('content-type',
+    'application/x-www-form-urlencoded;charset=UTF-8');
+    req.send(null);
+    document.fm.message.value = '';
+
+    var json_data = eval('(' + req.responseText + ')');
+    result.innerHTML = result.innerHTML + '<div class="server_side_message">'  + json_data.response + '</div>';
+    }
+  </script>
+  <div>
+    <div class="message_window" id="result"></div>
+    <div>
+      <form name="fm">
+	<label>質問：
+	  <input type="text" name="message" size="30" />
+	</label>
+	<input type="text" name="dummy" style="display:none;">
+	<input type="button" onclick="asyncSend();" value="送信" />
+      </div>
+    </div>
+  </div>
+
+
+
+
+</body>
+</html>
+
+
+
