@@ -1,6 +1,7 @@
 package MyScenario;
 use strict;
 use warnings;
+use HTML::Entities;
 
 sub load_scenario {
 
@@ -15,7 +16,8 @@ sub load_scenario {
 	    my $client_id = shift;
 	    my $client_data = shift;
 	    my $client_command = shift;
-	    my $response = "「 $client_command 」ですね。少々お待ち下さい。\n";
+	    my $client_command_res = encode_entities($client_command,q{&<>"'});
+	    my $response = "「 $client_command_res 」ですね。少々お待ち下さい。\n";
 	    my $next_state = 'final_state';
 	    my $mode = 'no_wait';
 
@@ -67,7 +69,7 @@ sub load_scenario {
 	    my $client_id = shift;
 	    my $client_data = shift;
 	    my $client_command = shift;
-	    my $last_failed_command = $client_data->{last_failed_message};
+	    my $last_failed_command = encode_entities($client_data->{last_failed_message},q{&<>"'});
 	    my $response = "質問の意図が理解できませんでした。<br> 「 $last_failed_command 」";
 	    my $next_state = 'init_state';
 	    my $mode = 'no_wait';

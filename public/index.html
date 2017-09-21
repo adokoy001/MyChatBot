@@ -9,7 +9,7 @@
   <style type="text/css">
     .message_window {
     overflow: scroll;
-    font-size: 9pt;
+    font-size: 10pt;
     width: 400px;
     height: 500px;
     }
@@ -19,8 +19,8 @@
     margin-bottom: 10px;
     margin-right: 50px;
     margin-left: 10px;
-    border: 1px dotted #222222;
-    background-color: #A0F0A0;
+    border: 1px dotted #202020;
+    background-color: #C0F0C0;
     }
 
     .client_side_message {
@@ -28,8 +28,8 @@
     margin-bottom: 10px;
     margin-right: 10px;
     margin-left: 50px;
-    border: 1px;
-    background-color: #A0A0F0;
+    border: 1px dotted #202020;
+    background-color: #C0C0F0;
     }
 
   </style>
@@ -80,7 +80,28 @@
     document.fm.message.value = '';
 
     var json_data = eval('(' + req.responseText + ')');
-    result.innerHTML = result.innerHTML + '<div class="server_side_message">'  + json_data.response + '</div>';
+    var current_mode = json_data.mode;
+
+    result.innerHTML = result.innerHTML + '<div class="server_side_message">' + json_data.response + '</div>';
+    var objDiv = document.getElementById("result");
+    objDiv.scrollTop = objDiv.scrollHeight;
+
+
+    while( current_mode == 'no_wait' ){
+
+      setInterval( function() {}, 500);
+      req.open('GET','/kaiwa?' + 'client_id='+ client_id, false);
+      req.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
+      req.send(null);
+      var json_data = eval('(' + req.responseText + ')');
+      current_mode = json_data.mode;
+      result.innerHTML = result.innerHTML + '<div class="server_side_message">' + json_data.response + '</div>';
+      var objDiv = document.getElementById("result");
+      objDiv.scrollTop = objDiv.scrollHeight;
+
+    }
+
+
     }
   </script>
   <div>
@@ -101,6 +122,7 @@
 
 </body>
 </html>
+
 
 
 

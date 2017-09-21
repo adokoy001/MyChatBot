@@ -82,8 +82,6 @@ sub input_client_command {
     my $current_state = $self->{current_state}->{$client_id};
     my ($next_state,$mode,$response,$new_client_data) = $current_scenario->{$current_state}->($client_id,$client_data,$client_command);
     $self->{client_data}->{$client_id} = $new_client_data;
-    use Data::Dumper;
-    print Dumper $client_data;
     return $next_state,$mode,$response;
 }
 
