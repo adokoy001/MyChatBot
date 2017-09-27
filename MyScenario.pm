@@ -6,18 +6,20 @@ use HTML::Entities;
 sub load_scenario {
 
     my $scenario = {
+	# 初期状態
 	init_state => sub {
 	    my $client_id = shift;
 	    my $client_data = shift;
 	    my $client_command = shift;
 	    return('state_01','wait',"こちらはフェイクサーバー株式会社のおしゃべりボットです！<br>\nサーバーなどを販売しております！何か質問して下さいませ！\n",$client_data);
 	},
+	# 初期状態から入力を受け取ったあとの分岐用
 	state_01 => sub {
 	    my $client_id = shift;
 	    my $client_data = shift;
 	    my $client_command = shift;
 	    my $client_command_res = encode_entities($client_command,q{&<>"'});
-	    my $response = "「 $client_command_res 」ですね。少々お待ち下さい。\n";
+	    my $response = "";
 	    my $next_state = 'final_state';
 	    my $mode = 'no_wait';
 
@@ -41,6 +43,7 @@ sub load_scenario {
 	    }
 	    return($next_state,$mode,$response,$client_data);
 	},
+	# 商品ラインナップの説明を求められた時
 	state_02 => sub {
 	    my $client_id = shift;
 	    my $client_data = shift;
@@ -50,6 +53,7 @@ sub load_scenario {
 	    my $mode = 'wait';
 	    return($next_state,$mode,$response,$client_data);
 	},
+	# 商品のスペックについての説明を求められた時
 	state_03 => sub {
 	    my $client_id = shift;
 	    my $client_data = shift;
@@ -59,6 +63,7 @@ sub load_scenario {
 	    my $mode = 'no_wait';
 	    return($next_state,$mode,$response,$client_data);
 	},
+	# あいさつされた時
 	state_04 => sub {
 	    my $client_id = shift;
 	    my $client_data = shift;
@@ -68,6 +73,7 @@ sub load_scenario {
 	    my $mode = 'no_wait';
 	    return($next_state,$mode,$response,$client_data);
 	},
+	# 購入ステップ1
 	state_buy_01 => sub {
 	    my $client_id = shift;
 	    my $client_data = shift;
@@ -91,6 +97,7 @@ sub load_scenario {
 	    }
 	    return($next_state,$mode,$response,$client_data);
 	},
+	# 購入ステップ2
 	state_buy_02 => sub {
 	    my $client_id = shift;
 	    my $client_data = shift;
@@ -116,6 +123,7 @@ sub load_scenario {
 	    }
 	    return($next_state,$mode,$response,$client_data);
 	},
+	# 購入ステップ3（最終）
 	state_buy_03 => sub {
 	    my $client_id = shift;
 	    my $client_data = shift;
@@ -126,7 +134,7 @@ sub load_scenario {
 	    my $mode = 'wait';
 
 	    if($client_command =~ /(はい|ハイ|yes)/){
-		$response = "$buy_target をご購入頂き誠にありがとうございます！<br>\n今後ともよろしくお願いします！<br>\n\n";
+		$response = "<font size=\"5\">$buy_target をご購入頂き誠にありがとうございます！<br>\n今後ともよろしくお願いします！<br></font>\n\n";
 		$next_state = 'init_state';
 		$mode = 'no_wait';
 		delete $client_data->{buy_target};
@@ -142,7 +150,7 @@ sub load_scenario {
 	    }
 	    return($next_state,$mode,$response,$client_data);
 	},
-
+	# イースターエッグ状態
 	state_easter_egg => sub {
 	    my $client_id = shift;
 	    my $client_data = shift;
@@ -160,7 +168,7 @@ sub load_scenario {
 	    delete $client_data->{easter_egg_command};
 	    return($next_state,$mode,$response,$client_data);
 	},
-
+	# 質問の意図が理解できなかった時
 	failed_go_init => sub {
 	    my $client_id = shift;
 	    my $client_data = shift;

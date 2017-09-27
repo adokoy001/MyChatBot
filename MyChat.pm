@@ -31,6 +31,12 @@ sub add_client_id {
     $self->{client_id_list}->{$client_id} = 1;
 }
 
+sub revoke_client_id {
+    my $self = shift;
+    my $client_id = shift;
+    $self->{client_id_list}->{$client_id} = 0;
+}
+
 sub get_client_id {
     my $self = shift;
     my $client_id = shift;

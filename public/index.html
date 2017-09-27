@@ -88,7 +88,9 @@
       var json_data = eval('(' + req.responseText + ')');
       var current_mode = json_data.mode;
 
-      result.innerHTML = result.innerHTML + '<div class="server_side_message">' + json_data.response + '</div>';
+      if(json_data.show_message == 1){
+        result.innerHTML = result.innerHTML + '<div class="server_side_message">' + json_data.response + '</div>';
+      }
       var objDiv = document.getElementById("result");
       objDiv.scrollTop = objDiv.scrollHeight;
 
@@ -98,14 +100,18 @@
         req.send(null);
         var json_data = eval('(' + req.responseText + ')');
         current_mode = json_data.mode;
-        result.innerHTML = result.innerHTML + '<div class="server_side_message">' + json_data.response + '</div>';
+        if(json_data.show_message == 1){
+          result.innerHTML = result.innerHTML + '<div class="server_side_message">' + json_data.response + '</div>';
+        }
         var objDiv = document.getElementById("result");
         objDiv.scrollTop = objDiv.scrollHeight;
       }
     }
   </script>
   <div>
-    <input type="button" onclick="init();" value="bot初期化" />
+    <div>
+      <input type="button" onclick="init();" value="bot初期化" />
+    </div>
     <div class="message_window" id="result"></div>
     <div>
       <form name="fm">
@@ -123,6 +129,7 @@
 
 </body>
 </html>
+
 
 
 
