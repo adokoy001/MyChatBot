@@ -6,6 +6,7 @@ use Data::Dumper;
 use File::Slurp; # 効率的な静的ファイル応答
 use Plack::Request;
 use Plack::Session;
+use lib './';
 use MyChat;
 use MyScenario;
 
