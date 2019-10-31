@@ -6,9 +6,16 @@ use Data::Dumper;
 use File::Slurp; # 効率的な静的ファイル応答
 use Plack::Request;
 use Plack::Session;
+use Storable qw(nstore retrieve lock_nstore lock_retrieve);
 use lib './';
 use MyChat;
 use MyScenario;
+
+$Storable::Deparse = 1;
+$Storable::Eval = 1;
+
+# botデータ保存
+my $bot_data_file = './bot_data';
 
 # 静的ファイル置き場
 my $public_dir = './public';
@@ -21,11 +28,14 @@ my $json = JSON->new->allow_nonref;
 my $bot = MyChat->new();
 $bot->set_current_scenario(MyScenario::load_scenario);
 
+lock_nstore $bot, $bot_data_file;
+
 # psgiアプリ本体
 my $app = sub {
     my $env = shift; # plackからの環境変数等が格納されたhashref
     my $req = Plack::Request->new($env);
     my $session = Plack::Session->new($env);
+    $bot = lock_retrieve $bot_data_file;
     # PATH_INFO毎に実行するサブルーチンを定義
     my $responses = {
         '/top' => sub {
@@ -42,6 +52,7 @@ my $app = sub {
 	    }
 	    $bot->add_client_id($client_id);
 	    $bot->set_current_state($client_id,'init_state');
+	    lock_nstore $bot, $bot_data_file;
             return [
                 200,
                 [ 'Content-Type' => 'application/json' ],
@@ -59,6 +70,7 @@ my $app = sub {
 		    $show_message = 0;
 		}
 		$bot->set_current_state($client_id,$next_state);
+		lock_nstore $bot, $bot_data_file;
 		return [
 		    200,
 		    [ 'Content-Type' => 'application/json' ],
@@ -72,7 +84,8 @@ my $app = sub {
 		       )
 		     ]
 		   ];
-	    }else{
+	      }else{
+		lock_nstore $bot, $bot_data_file;
 		return [
 		    200,
 		    [ 'Content-Type' => 'application/json' ],
